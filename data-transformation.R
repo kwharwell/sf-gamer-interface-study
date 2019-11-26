@@ -9,6 +9,7 @@ df <- read_csv("./Data/sf-behavior-extraction-2019-10-10.csv")
 subInfo <- read_csv("./Data/subject-information-2019-08-16.csv")
 irr <- read.csv("./Data/IRR_Combined_Subjects_Questionnaire_Responses.csv")
 trans <- read_csv("./Data/extracted-transcripts.csv", col_names = FALSE)
+allTrans <- read_csv("./Data/transcripts-all-subs.csv")
 
 # Transform SF behavioral data --------------------------------------------
 
@@ -109,7 +110,8 @@ write_csv(finalFrame3, "./Output/all-games.csv")
 
 # Transform transcript data -----------------------------------------------
 
-# ____All subjects --------------------------------------------------------
+
+# ____All subjects, all statements ----------------------------------------
 
 # Add subject information
 colnames(trans) <- c("statement", "interfaceMarkers", "gameMarkers", "lineNumber", 
@@ -135,3 +137,78 @@ data <- mutate(data, cumulativeGameNumber = case_when(
 
 write_csv(data, "./Output/transcripts-all-subs.csv")
 
+# ____Fortress-destruction statements -------------------------------------
+
+data <- allTrans
+data$fortressRelevant <- str_detect(data$statementClean, "fortress")
+data$fortressRelevant <- as.numeric(data$fortressRelevant)
+allFortressRelevant <- filter(data, fortressRelevant == 1)
+allFortressRelevantQC <- mutate(allFortressRelevant, fortressRelevant = 0) %>% 
+  select(statementClean, fortressRelevant, Participant_ID, gameNumber, cumulativeGameNumber, lineNumber)
+df2 <- allFortressRelevantQC[sample(nrow(allFortressRelevant)),]
+
+# ________Write data for human coding -------------------------------------
+
+write_csv(df2, "./Output/fortress-statements-qc-2019-10-04.csv")
+
+
+# ____Bonus-collection statements -----------------------------------------
+
+data <- allTrans
+data$bonusRelevant <- str_detect(data$statementClean, "bonus")
+data$bonusRelevant <- as.numeric(data$bonusRelevant)
+allBonusRelevant <- filter(data, bonusRelevant == 1)
+allBonusRelevantQC <- mutate(allBonusRelevant, bonusRelevant = 0) %>% 
+  select(statementClean, bonusRelevant, Participant_ID, gameNumber, cumulativeGameNumber, lineNumber)
+df2 <- allBonusRelevantQC[sample(nrow(allBonusRelevant)),]
+
+
+# ________Write data for human coding -------------------------------------
+
+write_csv(df2, "./Output/bonus-statements-qc-2019-10-10.csv")
+
+
+# ____Ship-control statements ---------------------------------------------
+
+data <- allTrans
+
+# New keyword list derived from SF instruction video 11-11-2019
+keywords<-c("agon|rotat|turn|stop|fast|slow|move|moving|accelerat|control|velocity|circl|bound|hyper|space|
+            wrap|forward|backward|left|right|thrust|fly|flown|flight|clockwise|edge|trajector|screen|
+            region|maneuver|diagonal")
+
+# Generate dataframe of only detected potentially control-relevant statements
+data$cRelevant <- str_detect(data$statementClean, keywords)
+data$cRelevant <- as.numeric(data$cRelevant)
+data$phrase <- str_detect(data$statementClean, "\\w \\w")
+#data <- filter(data, phrase == TRUE)
+allControlRelevant <- filter(data, cRelevant == 1)
+allControlRelevantQC <- mutate(allControlRelevant, cRelevant = 0) %>%
+  filter(Sex == 1) %>% 
+  filter(Gamer != 99) %>%
+  filter(cumulativeGameNumber < 11) %>% 
+  select(statementClean, cRelevant, Participant_ID, gameNumber, cumulativeGameNumber, lineNumber) 
+  
+
+# Calculate sample of statements necessary to code 
+kappaSample <- N.cohen.kappa(rate1 = .5, rate2 = .5, k1 = .8, k0 = .907,
+                             alpha = .01, power = .9)
+
+df2 <- allControlRelevantQC[sample(nrow(allControlRelevantQC)),]
+
+consensusSubset <- df2[1:kappaSample, ]
+
+individualSubset <- df2[(kappaSample + 1):length(df2$statementClean), ]
+
+alexSubset <- individualSubset[1:(length(individualSubset$statementClean)/2), ]
+
+patriciaSubset <- individualSubset[(length(individualSubset$statementClean)/2 + 1):length(individualSubset$statementClean), ]
+
+
+# ________Write data for human coding -------------------------------------
+
+write_csv(df2, "./Output/men-first-10-control-relevant-statements.csv")
+write_csv(consensusSubset, "./Output/control-relevant-statements-consensus.csv")
+write_csv(individualSubset, "./Output/control-relevant-statements-individual.csv")
+write_csv(alexSubset, "./Output/control-relevant-statements-alex.csv")
+write_csv(patriciaSubset, "./Output/control-relevant-statements-patricia.csv")
