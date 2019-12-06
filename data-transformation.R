@@ -10,6 +10,8 @@ subInfo <- read_csv("./Data/subject-information-2019-08-16.csv")
 irr <- read.csv("./Data/IRR_Combined_Subjects_Questionnaire_Responses.csv")
 trans <- read_csv("./Data/extracted-transcripts.csv", col_names = FALSE)
 allTrans <- read_csv("./Data/transcripts-all-subs.csv")
+fortStatements <- read_csv("./Data/fortress-statements.csv")
+fortConsensus <- read_csv("./Data/fortressAgreement-consensus.csv")
 
 # Transform SF behavioral data --------------------------------------------
 
@@ -110,7 +112,6 @@ write_csv(finalFrame3, "./Output/all-games.csv")
 
 # Transform transcript data -----------------------------------------------
 
-
 # ____All subjects, all statements ----------------------------------------
 
 # Add subject information
@@ -150,7 +151,15 @@ df2 <- allFortressRelevantQC[sample(nrow(allFortressRelevant)),]
 # ________Write data for human coding -------------------------------------
 
 write_csv(df2, "./Output/fortress-statements-qc-2019-10-04.csv")
+write_csv(allFortressRelevant, "./Output/fortress-statements.csv")
 
+
+# ________Integrate with existing consensus coding ------------------------
+
+y <- select(fortConsensus, statementClean, Participant_ID, gameNumber,
+            agree, consensusRating)
+mergedFortStatements <- left_join(fortStatements, y, by = c("Participant_ID",
+                                    "gameNumber", "statementClean"))
 
 # ____Bonus-collection statements -----------------------------------------
 
@@ -166,6 +175,7 @@ df2 <- allBonusRelevantQC[sample(nrow(allBonusRelevant)),]
 # ________Write data for human coding -------------------------------------
 
 write_csv(df2, "./Output/bonus-statements-qc-2019-10-10.csv")
+write_csv(allBonusRelevant, "./Output/bonus-statements.csv")
 
 
 # ____Ship-control statements ---------------------------------------------
@@ -190,9 +200,10 @@ allControlRelevantQC <- mutate(allControlRelevant, cRelevant = 0) %>%
   select(statementClean, cRelevant, Participant_ID, gameNumber, cumulativeGameNumber, lineNumber) 
   
 
-# Calculate sample of statements necessary to code 
-kappaSample <- N.cohen.kappa(rate1 = .5, rate2 = .5, k1 = .8, k0 = .907,
-                             alpha = .01, power = .9)
+# Calculate sample of statements necessary to code
+# Assumed k0 is .9, since had to create subset before agreement for previous codings could be recalculated
+kappaSample <- N.cohen.kappa(rate1 = .5, rate2 = .5, k1 = .8, k0 = .9,
+                             alpha = .05, power = .9)
 
 df2 <- allControlRelevantQC[sample(nrow(allControlRelevantQC)),]
 
