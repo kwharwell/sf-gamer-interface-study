@@ -156,7 +156,7 @@ write_csv(allFortressRelevant, "./Output/fortress-statements.csv")
 
 # ________Integrate with existing consensus coding ------------------------
 
-y <- select(fortConsensus, statementClean, Participant_ID, gameNumber,
+y <- select(fortConsensus, Patricia, Alex, statementClean, Participant_ID, gameNumber,
             agree, consensusRating)
 mergedFortStatements <- left_join(fortStatements, y, by = c("Participant_ID",
                                     "gameNumber", "statementClean"))
