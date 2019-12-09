@@ -41,25 +41,13 @@ groupDF <- df %>%
 
 # ____Fortress-destruction statements -------------------------------------
 
-# Generate list of participant IDs to be excluded
-subjectList <- data %>%
-  filter(Sex == "Men") %>% 
-  filter(Exclude == 0) %>% 
-  select(Participant_ID) %>% 
-  unique()
-
-
-men10 <- fortressStatements %>% 
-  filter(Participant_ID %in% subjectList$Participant_ID) %>% 
-  filter(cumulativeGameNumber < 11)
-
+# Restrict statements to men, only gamers and non-gamers, and first 10 games
 df <- fortressStatements %>% 
   filter(Sex == 1) %>% 
   filter(Gamer != 99) %>%
   filter(cumulativeGameNumber < 11)
 
-
-
+# Calculate agreement as Cohen's Kappa
 qcMatFortress <- select(df, Patricia:Alex)
 kappa2(qcMatFortress)
 
