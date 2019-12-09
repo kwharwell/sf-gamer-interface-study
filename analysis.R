@@ -5,8 +5,9 @@ library(tidyverse)
 
 # Load data
 data <- read_csv("./Data/all-games.csv")
-fortressStatements <- read_csv("./Data/fortressAgreement-consensus.csv")
+fortressStatements <- read_csv("./Data/fortress-statements-with-coding.csv")
 bonusStatements <- read_csv("./Data/bonusAgreement-consensus.csv")
+alltrans <- read_csv("./Data/transcripts-all-subs.csv")
 
 # Descriptive statistics --------------------------------------------------
 
@@ -26,6 +27,16 @@ t2 <- df %>%
 
 #write_csv(t1, "./Output/Strategy_use_descriptives.csv")
 
+# Total number of statements, number of subjects with protocols
+df <- alltrans %>% 
+  filter(Sex == 1) %>% 
+  filter(Gamer != 99) %>%
+  filter(cumulativeGameNumber < 11)
+
+groupDF <- df %>%
+  group_by(Gamer) %>% 
+  summarise(count = n_distinct(Participant_ID))
+
 # Calculate IRR for protocol coding ---------------------------------------
 
 # ____Fortress-destruction statements -------------------------------------
@@ -42,7 +53,14 @@ men10 <- fortressStatements %>%
   filter(Participant_ID %in% subjectList$Participant_ID) %>% 
   filter(cumulativeGameNumber < 11)
 
-qcMatFortress <- select(men10, Patricia:Alex)
+df <- fortressStatements %>% 
+  filter(Sex == 1) %>% 
+  filter(Gamer != 99) %>%
+  filter(cumulativeGameNumber < 11)
+
+
+
+qcMatFortress <- select(df, Patricia:Alex)
 kappa2(qcMatFortress)
 
 
