@@ -12,6 +12,7 @@ trans <- read_csv("./Data/extracted-transcripts.csv", col_names = FALSE)
 allTrans <- read_csv("./Data/transcripts-all-subs.csv")
 fortStatements <- read_csv("./Data/fortress-statements.csv")
 fortConsensus <- read_csv("./Data/fortressAgreement-consensus.csv")
+shipControlConsensus <- read_csv("./Data/cRelevantAgreement.csv")
 
 # Transform SF behavioral data --------------------------------------------
 

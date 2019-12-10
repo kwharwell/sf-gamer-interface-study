@@ -2,12 +2,14 @@
 
 # Load libraries
 library(tidyverse)
+library(irr)
 
 # Load data
 data <- read_csv("./Data/all-games.csv")
 fortressStatements <- read_csv("./Data/fortress-statements-with-coding.csv")
-bonusStatements <- read_csv("./Data/bonusAgreement-consensus.csv")
+bonusStatements <- read_csv("./Data/bonus-statements-with-coding.csv")
 alltrans <- read_csv("./Data/transcripts-all-subs.csv")
+shipControlConsensus <- read_csv("./Data/cRelevantAgreement.csv")
 
 # Descriptive statistics --------------------------------------------------
 
@@ -54,19 +56,20 @@ kappa2(qcMatFortress)
 
 # ____Bonus-collection statements -----------------------------------------
 
-men10 <- bonusStatements %>% 
-  filter(Participant_ID %in% subjectList$Participant_ID) %>% 
+# Restrict statements to men, only gamers and non-gamers, and first 10 games
+df <- bonusStatements %>% 
+  filter(Sex == 1) %>% 
+  filter(Gamer != 99) %>%
   filter(cumulativeGameNumber < 11)
 
-qcMatBonus <- select(men10, Patricia:Alex)
+# Calculate agreement as Cohen's Kappa
+qcMatBonus <- select(df, Patricia:Alex)
 kappa2(qcMatBonus)
-
-qcAgree <- bonus %>%
-  mutate(agreement = if_else(Alex == Patricia, 1, 0))
-
-qcDisagree <- filter(qcAgree, agreement == 0)
 
 
 # ____Ship-control statements ---------------------------------------------
 
+# Calculate agreement as Cohen's Kappa
+qcMatBonus <- select(shipControlConsensus, cRelevantAlex, cRelevantPatricia)
+kappa2(qcMatBonus)
 
