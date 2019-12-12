@@ -139,6 +139,19 @@ data <- mutate(data, cumulativeGameNumber = case_when(
 
 write_csv(data, "./Output/transcripts-all-subs.csv")
 
+
+# ____Subset of subjects for analysis -------------------------------------
+
+df <- alltrans %>% 
+  filter(Sex == 1) %>% 
+  filter(Gamer != 99) %>%
+  filter(cumulativeGameNumber < 11)
+
+
+# ________ Write data -----------------------------------------------------
+
+write_csv(df, "./Output/transcripts-analysis-sample.csv")
+
 # ____Fortress-destruction statements -------------------------------------
 
 data <- allTrans
