@@ -169,7 +169,7 @@ for (fileName in fileNames) {
   colnames(temp) <- "x"
   temp$x <- as.numeric(temp$x)
   distanceX = (temp$x - 114.0)
-  cumulativeDistanceX <- sum(distanceX)
+  cumulativeDistanceX <- sum(abs(distanceX))
   varianceX <- var(distanceX)
   
   # Put all values into a single data frame
