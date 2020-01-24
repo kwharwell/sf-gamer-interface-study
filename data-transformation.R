@@ -5,7 +5,7 @@ library(tidyverse)
 library(irr)
 
 # Load data
-df <- read_csv("./Data/sf-behavior-extraction-2019-10-10.csv")
+df <- read_csv("./Data/sf-behavior-extraction.csv")
 subInfo <- read_csv("./Data/subject-information-2019-08-16.csv")
 irr <- read.csv("./Data/IRR_Combined_Subjects_Questionnaire_Responses.csv")
 trans <- read_csv("./Data/extracted-transcripts.csv", col_names = FALSE)
