@@ -161,11 +161,21 @@ for (fileName in fileNames) {
   # }
   # avg_interthrust_latency <- mean(na.omit(consecutive_thrusts))
   
+  # Cumulative Distance from Spawn X Coordinate, and variance
+  v14 <- sample[grep("sf.object.SF_Ship, Ship1,", sample)]
+  xDistanceVector <- str_match(v14, 
+                           "([0-9]+.[0-9]+), ([0-9]+.[0-9]+), ([0-9]+)")
+  temp <- data.frame(na.omit(xDistanceVector[, 2]),stringsAsFactors=FALSE)
+  colnames(temp) <- "x"
+  temp$x <- as.numeric(temp$x)
+  distanceX = (temp$x - 114.0)
+  cumulativeDistanceX <- sum(distanceX)
+  varianceX <- var(distanceX)
   
   # Put all values into a single data frame
   temp <- c(CW,CCW,Thrust,WorldWrap,FortressCollision,fortressDestructions, shipDeaths, Score, WorldWrapper,
             delWorldWrapper, discrete_thrusts, discrete_CWrotations, discrete_CCWrotations, 
-            Constant_Accelerations)
+            Constant_Accelerations, cumulativeDistanceX, varianceX)
   temp.df <- data.frame(temp)
   trans.temp.df <- data.frame(t(temp.df))
   
@@ -199,7 +209,8 @@ colnames(a) <- c("FileName","CWrotations","CCWrotations","Thrusts",
                  "WorldWraps","FortressCollisions", "fortressDestructions", "shipDeaths", 
                  "Total","Points","Velocity","Control","Speed", "Bpnt", "Bmis", "WorldWrapper", "delWorldWrapper",
                  "discrete_thrusts", "discrete_CWrotations", 
-                 "discrete_CCWrotations", "Constant_Accelerations")
+                 "discrete_CCWrotations", "Constant_Accelerations", "cumulativeDistanceX",
+                 "varianceX")
 
 write_csv(a,
-  "/Users/kyleharwell/Desktop/Research/SF_Strategy_Study/Output/sf-behavior-extraction-2019-10-10.csv")
+  "/Users/kyleharwell/Desktop/Research/sf-gamer-interface-study/Output/sf-behavior-extraction.csv")
