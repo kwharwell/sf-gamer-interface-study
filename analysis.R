@@ -13,7 +13,15 @@ shipControlConsensus <- read_csv("./Data/cRelevantAgreement.csv")
 
 # Descriptive statistics --------------------------------------------------
 
-df <- filter(data, Exclude == 0)
+# Number of 100% worldwrapper games among men, first 10 games
+df <- data %>% 
+  filter(Sex == "Men") %>% 
+  filter(Gamer != "In-between") %>%
+  filter(cumulativeGameNumber < 11)
+
+pVarX <- ggplot(data, aes(x = varianceX)) +
+  geom_histogram(bins = 30)
+pVarX
 
 t1 <- df %>% 
   grouped_df(c("Sex_by_Interface", "Gamer_by_Interface", "Participant_ID")) %>% 
